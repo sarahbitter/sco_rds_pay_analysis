@@ -21,9 +21,11 @@ rds_data <- data_09_21 %>% filter(grepl("RESEARCH DATA ANALYST", position) |
                                     grepl("RESEARCH MANAGER", position) |
                                     grepl("CHIEF OF RESEARCH CORRECTIONAL PROGRAM", position) |
                                     grepl("TAX RESEARCH SPECIALIST", position))
-  
+####  
 
+#### Create RDS name, class, and range variables ####
 # Create variable storing RDS name for pre-RDS positions
+# Create dataset with RDS name and RDS class for matching
 rds_name_matching_data <- data.frame(rds_name = c("RESEARCH DATA ANALYST II -GENERAL-, RANGE A",
                                                   "RESEARCH SUPERVISOR II -GENERAL-",
                                                   "RESEARCH DATA SPECIALIST I",
@@ -273,19 +275,23 @@ rds_name_matching_data <- data.frame(rds_name = c("RESEARCH DATA ANALYST II -GEN
                                                    "RESEARCH DATA SPECIALIST III",
                                                    "RESEARCH DATA SUPERVISOR I",
                                                    "RESEARCH DATA SUPERVISOR II"))
-
+# Merge in RDS names and classes
 rds_data <- merge(rds_data,
                   rds_name_matching_data,
                   by.x = c("position"),
                   all.x = TRUE)
 
+# Relocate variables and create NAs
 rds_data <- rds_data %>% relocate(c(rds_class, rds_name, position), .after = department_or_subdivision) %>%
   mutate(rds_name = na_if(rds_name, "NA"),
          rds_class = na_if(rds_class, "NA"))
 
+# Sort data
 rds_data <- rds_data %>% arrange(year, employer_name, department_or_subdivision, position)
 
+# Create range variable and place after class variable
 rds_data <- rds_data %>% mutate(range = ifelse(grepl("RANGE", position), 
                                                substring(position, nchar(position)), 
                                                NA)) %>%
                          relocate(range, .after = rds_class)
+####
